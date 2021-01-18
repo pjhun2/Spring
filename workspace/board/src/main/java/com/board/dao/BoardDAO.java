@@ -33,4 +33,3 @@ public int searchCount(String searchType, String keyword) throws Exception;
 
 
 }
-

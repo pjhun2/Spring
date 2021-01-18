@@ -12,21 +12,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.board.domain.BoardVO;
 import com.board.domain.Page;
+import com.board.domain.ReplyVO;
 import com.board.service.BoardService;
+import com.board.service.ReplyService;
 
 @Controller
 @RequestMapping("/board/*")
+
 public class BoardController {
 
  @Inject
  private BoardService service;
 
+ @Inject
+ private ReplyService replyService;
+ 
  @RequestMapping(value = "/list", method = RequestMethod.GET)
  public void getList(Model model) throws Exception {
   
-  List list = null;
-  list = service.list();
-  model.addAttribute("list", list);
+		List<BoardVO> list = null; 
+		list = service.list();
+		model.addAttribute("list", list);		
  }
  
 //게시물 작성
@@ -50,6 +56,11 @@ public void getView(@RequestParam("bno") int bno, Model model) throws Exception 
 	model.addAttribute("view", vo);
 	
 
+	// 댓글 조회
+	List<ReplyVO> reply = null;
+	reply = replyService.list(bno);
+	model.addAttribute("reply", reply);
+	
 }
 
 @RequestMapping(value = "/modify", method = RequestMethod.GET)
@@ -80,15 +91,6 @@ return "redirect:/board/list";
 }
 
 //게시물 목록 + 페이징 추가
-@RequestMapping(value = "/listpage", method = RequestMethod.GET)
-public void getListPage(Model model) throws Exception {
-
-List list = null; 
-list = service.list();
-model.addAttribute("list", list);   
-}
-
-//게시물 목록 + 페이징 추가
 @RequestMapping(value = "/listPage", method = RequestMethod.GET)
 public void getListPage(Model model, @RequestParam("num") int num) throws Exception {
 
@@ -97,7 +99,7 @@ public void getListPage(Model model, @RequestParam("num") int num) throws Except
 	page.setNum(num);
 	page.setCount(service.count());  
 
-	List list = null; 
+	List<BoardVO> list = null; 
 	list = service.listPage(page.getDisplayPost(), page.getPostNum());
 
 	model.addAttribute("list", list);
@@ -191,17 +193,20 @@ public void getListPageSearch(Model model, @RequestParam("num") int num) throws 
 @RequestMapping(value = "/listPageSearch", method = RequestMethod.GET)
 public void getListPageSearch(Model model, @RequestParam("num") int num, 
 		@RequestParam(value = "searchType",required = false, defaultValue = "title") String searchType,
-		   @RequestParam(value = "keyword",required = false, defaultValue = "") String keyword
+		@RequestParam(value = "keyword",required = false, defaultValue = "") String keyword
 ) throws Exception {
 
 
 Page page = new Page();
 
 page.setNum(num);
+//page.setCount(service.searchCount(searchType, keyword));
 page.setCount(service.searchCount(searchType, keyword));
 
 //검색 타입과 검색어
-page.setSearchTypeKeyword(searchType, keyword);
+//page.setSearchTypeKeyword(searchType, keyword);
+page.setSearchType(searchType);
+page.setKeyword(keyword);
 
 
 List<BoardVO> list = null; 
@@ -212,12 +217,10 @@ model.addAttribute("list", list);
 model.addAttribute("page", page);
 model.addAttribute("select", num);
 
-model.addAttribute("searchType", searchType);
-model.addAttribute("keyword", keyword);
+//model.addAttribute("searchType", searchType);
+//model.addAttribute("keyword", keyword);
 
+
+	}
 
 }
-
-}
-
-
