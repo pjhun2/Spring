@@ -4,7 +4,9 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.board.domain.ReplyVO;
 import com.board.service.ReplyService;
 
 @Controller
@@ -12,7 +14,16 @@ import com.board.service.ReplyService;
 public class ReplyControlloer {
 
 @Inject
-private ReplyService service;
+private ReplyService replyService;
+
+//댓글 작성
+@RequestMapping(value = "/write", method = RequestMethod.POST)
+public String posttWirte(ReplyVO vo) throws Exception {
+ 
+	replyService.write(vo);
+ 
+ return "redirect:/board/view?bno=" + vo.getBno();
+}
 
 
 	
